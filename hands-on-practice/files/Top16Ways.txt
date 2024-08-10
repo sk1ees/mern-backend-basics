@@ -1,0 +1,9 @@
+Parameters: This method accept three parameters as mentioned above and described below:
+
+path: It holds the path of the directory from where the contents have to be read. It can be a String, Buffer or URL.
+options: It is an object that can be used to specify optional parameters that will affect the method. It has two optional parameters:
+encoding: It is a string value which specifies which encoding would be used for the filenames given to the callback argument. The default value is ‘utf8’.
+withFileTypes: It is a boolean value which specifies whether the files would be returned as fs.Dirent objects. The default value is ‘false’.
+callback: It is the function that would be called when the method is executed.
+err: It is an error that would be thrown if the operation fails.
+files: It is an array of String, Buffer or fs.Dirent objects that contain the files in the directory.

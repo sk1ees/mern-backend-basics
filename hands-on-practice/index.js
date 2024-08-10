@@ -20,11 +20,23 @@ app.get('/', (req, res) => {
     })
 })
 app.post('/create', (req, res) => {
-    fs.writeFile(`./files/${req.body.title.split(' ').join('')}.txt`, req.body.details, (err) => {
+    fs.writeFile(`./files/${req.body.title.split(' ').join('').slice(0, 10)}.txt`, req.body.details, (err) => {
         res.redirect("/")
     });
 })
-
+app.get(`/file/:filename`, (req, res) => {
+    fs.readFile(`./files/${req.params.filename}`, "utf-8", (err, files) => {
+        res.render('show', { filename: req.params.filename, filedesc: files });
+    })
+})
+app.get(`/edit/:filename`, (req, res) => {
+    res.render('edit', { filename: req.params.filename });
+})
+app.post('/edit', (req,res) => {
+    fs.rename(`./files/${req.body.previous}`, `./files/${req.body.new}.txt`, () => {
+        res.redirect('/')
+    })
+})
 app.listen(3000, () => {
     console.log("Server started!")
 })
