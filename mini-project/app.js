@@ -21,9 +21,25 @@ app.get('/', (req, res) => {
 app.get('/login', (req, res) => {
     res.render('login');
 })
-app.get('/profile', isLoggedIn, (req, res) => {
-    console.log(req.user);
-    res.render('login');
+app.get('/profile', isLoggedIn, async (req, res) => {
+    let user = await userModel.findOne({ email: req.user.email }).populate('post');
+
+    res.render('profile', { user });
+})
+app.post('/post', isLoggedIn, async (req, res) => {
+
+    let user = await userModel.findOne({ email: req.user.email })
+    let { content } = req.body;
+    let post = await postModel.create({
+        user: user._id,
+        content,
+
+
+    })
+
+    user.post.push(post._id);
+    await user.save();
+    res.redirect('/profile');
 })
 
 
@@ -49,7 +65,7 @@ app.post('/register', async (req, res) => {
 
             let token = jwt.sign({ email: email, userId: user._id }, "secret");
             res.cookie("token", token);
-            res.send('registered!')
+            res.redirect('/login');
         })
     })
 })
@@ -62,7 +78,7 @@ app.post('/login', async (req, res) => {
         if (results) {
             let token = jwt.sign({ email: email, userId: user._id }, "secret");
             res.cookie("token", token);
-            return res.status(200).send("you can login")
+            return res.status(200).redirect('/profile');
         }
         else res.redirect('/login');
     })
@@ -72,7 +88,7 @@ app.post('/login', async (req, res) => {
 //protected routes
 
 function isLoggedIn(req, res, next) {
-    if (req.cookies.token === "") res.send('You must be logged IN!')
+    if (req.cookies.token === "") res.redirect('/login')
     else {
         let data = jwt.verify(req.cookies.token, "secret")
         req.user = data;
